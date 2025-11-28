@@ -1,0 +1,7 @@
+fastapi
+uvicorn
+youtube-comment-downloader
+vaderSentiment
+pytube
+pandas
+pydantic
