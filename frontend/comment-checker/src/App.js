@@ -13,7 +13,8 @@ import {
   CartesianGrid,
 } from "recharts";
 
-const BACKEND_URL = "http://127.0.0.1:8000/analyze_video";
+const BACKEND_URL = "https://youtube-comment-checker.onrender.com/analyze_video";
+
 
 // helper to extract ID from different YouTube URL formats
 function extractVideoId(url) {
