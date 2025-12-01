@@ -13,7 +13,10 @@ import {
   CartesianGrid,
 } from "recharts";
 
-const BACKEND_URL = "https://youtube-comment-checker.onrender.com/analyze_video";
+const BACKEND_URL =
+  process.env.REACT_APP_BACKEND_URL ||
+  "https://youtube-comment-checker.onrender.com/analyze_video";
+
 
 
 // helper to extract ID from different YouTube URL formats
