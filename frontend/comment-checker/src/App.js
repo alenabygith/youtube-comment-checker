@@ -13,11 +13,9 @@ import {
   CartesianGrid,
 } from "recharts";
 
+// 🔥 HARD-CODED BACKEND URL – NO LOCALHOST ANYMORE
 const BACKEND_URL =
-  process.env.REACT_APP_BACKEND_URL ||
   "https://youtube-comment-checker.onrender.com/analyze_video";
-
-
 
 // helper to extract ID from different YouTube URL formats
 function extractVideoId(url) {
@@ -40,7 +38,6 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // ---------- chart data ----------
   const totals = data?.totals;
   const pct = data?.percentages;
 
@@ -59,7 +56,6 @@ function App() {
       value: w.count,
     })) || [];
 
-  // ---------- main action ----------
   const handleAnalyze = async () => {
     if (!url.trim()) {
       setError("Please paste a YouTube URL.");
@@ -79,18 +75,35 @@ function App() {
         body: JSON.stringify({ video_url: url }),
       });
 
-      if (!res.ok) {
-        throw new Error("Backend error");
+      const text = await res.text();
+      console.log("Backend status:", res.status);
+      console.log("Backend raw response:", text);
+
+      let json = null;
+      try {
+        json = text ? JSON.parse(text) : null;
+      } catch (e) {
+        throw new Error(
+          `Non-JSON response from backend (status ${res.status}): ${text.slice(
+            0,
+            200
+          )}`
+        );
       }
 
-      const json = await res.json();
-      if (json.error) {
+      if (!res.ok) {
+        const msg = json?.error || `HTTP ${res.status}: ${text}`;
+        throw new Error(msg);
+      }
+
+      if (json?.error) {
         setError(json.error);
       } else {
         setData(json);
       }
     } catch (err) {
-      setError("Something went wrong. Make sure backend is running.");
+      console.error("Request failed:", err);
+      setError(`Request failed: ${err.message}`);
     } finally {
       setLoading(false);
     }
@@ -121,7 +134,8 @@ function App() {
           </button>
         </div>
         <p className="helper-text">
-          Make sure your FastAPI backend is running on 127.0.0.1:8000.
+          Backend is hosted on Render:
+          youtube-comment-checker.onrender.com
         </p>
 
         {loading && <p>Analyzing comments… this may take a few seconds.</p>}
